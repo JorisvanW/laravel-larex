@@ -41,7 +41,7 @@ class LaravelImporter implements Importer
                 $group = pathinfo($file, PATHINFO_FILENAME);
                 $fileLang  = str_replace('_', '-', basename(dirname($file)));
 
-                if ($lang === $fileLang) {
+                if ($lang === $fileLang && !in_array($group, config('larex.exclude_groups', []))) {
                     $files2[] = $file;
                 }
             }

@@ -34,9 +34,19 @@ class LaravelExporter implements Exporter
         $exclude = $command->option('exclude') !== null ? explode(',', $command->option('exclude')) : [];
         $eol = config('larex.eol', PHP_EOL);
 
+        // Rewrite the language keys
+        $languagesRewrite = [];
+        foreach (config('app.locales') as $lang => $langData) {
+            foreach ($languages as $langOld => $data) {
+                if ($langOld === array_get($langData, 'larex')) {
+                    $languagesRewrite[$lang] = $data;
+                }
+            }
+        }
+        
         //finally save the files
         $found = 0;
-        foreach ($languages as $language => $groups) {
+        foreach ($languagesRewrite as $language => $groups) {
             if (count($include) > 0 && !in_array($language, $include, true)) {
                 continue;
             }

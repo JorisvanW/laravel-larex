@@ -33,7 +33,22 @@ class LaravelImporter implements Importer
         //get all files
         $files = File::glob(lang_path('**/*.php'));
 
-        foreach ($files as $file) {
+        // Set the languages in order of usage
+        $files2 = [];
+
+        foreach (config('app.locales') as $lang => $data) {
+            foreach ($files as $file) {
+                $items = include $file;
+                $group = pathinfo($file, PATHINFO_FILENAME);
+                $fileLang  = str_replace('_', '-', basename(dirname($file)));
+
+                if ($lang === $fileLang) {
+                    $files2[] = $file;
+                }
+            }
+        }
+        
+        foreach ($files2 as $file) {
             $items = include $file;
             $group = pathinfo($file, PATHINFO_FILENAME);
             $lang = str_replace('_', '-', basename(dirname($file)));
@@ -46,6 +61,9 @@ class LaravelImporter implements Importer
                 continue;
             }
 
+            // Rewrite lang
+            $lang = array_get(config('app.locales'), $lang . '.larex');
+            
             if (!$languages->contains($lang)) {
                 $languages->push($lang);
             }
